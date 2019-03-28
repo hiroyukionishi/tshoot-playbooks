@@ -3,6 +3,7 @@ Solution
 + First obtain information on src/dst host pair that is not able to communicate:
 server01: 192.168.10.10/24 00:03:00:11:11:01
 server03: 192.168.20.10/24 00:03:00:33:33:01
++ ping server01 to server03 to learn mac to leafs.
 
 + Check the BGP EVPN routes on leaf01 first, there are only routes from the CLAG pair (12.12.12.12), but not from leaf03 which should be sourced from 10.0.0.13:
   cumulus@leaf01:~$ net show bgp l2vpn evpn route
@@ -139,15 +140,14 @@ server03: 192.168.20.10/24 00:03:00:33:33:01
   UP     vni10010  N/A  1500   Trunk/L2                               Master: bridge(UP)
   UP     vni10020  N/A  1500   Trunk/L2                               Master: bridge(UP)
 
+
 + Adding SVI in VLAN 10 with IP address 192.168.10.3/24 restored connectivity between the two servers:
+  Now, ping should work.
   cumulus@server01:~$ ping 192.168.20.10
   PING 192.168.20.10 (192.168.20.10) 56(84) bytes of data.
   64 bytes from 192.168.20.10: icmp_seq=1 ttl=63 time=2.76 ms
   64 bytes from 192.168.20.10: icmp_seq=2 ttl=63 time=3.03 ms
   64 bytes from 192.168.20.10: icmp_seq=3 ttl=63 time=2.42 ms
-
-
-
 
 So in summary, below configuration changes are required:
 - leaf03 not advertise VNIs

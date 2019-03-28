@@ -49,7 +49,8 @@ Solution
   	bridge-vids 10
   	bridge-vlan-aware yes
 
-+ Adding Po1 into the bridge by configuring it as an access port for VLAN 10 on both leaf01 and leaf02 with "net add bond Po1 bridge access 10", now server01's MAC address is getting populated into the bridge fdb, also in EVPN route:
++ Adding Po1 into the bridge by configuring it as an access port for VLAN 10 on both leaf01 and leaf02 with "net add bond Po1 bridge access 10". 
++ However, net commit should not pass with the error; vxlan-local-tunnelip and clagd-vxlan-anycast-ip should be identical. Let's change it with 'net add vxlan vni10010 vxlan local-tunnelip 10.0.0.11 (12;leaf02)', now server01's MAC address is getting populated into the bridge fdb, also in EVPN route:
   cumulus@leaf01:~$ bridge fdb show | grep 11:11:01
   00:03:00:11:11:01 dev Po1 vlan 10 master bridge
   cumulus@leaf02:~$ bridge fdb show | grep 11:11:01
@@ -128,7 +129,7 @@ Solution
       neighbor spine activate
       advertise-all-vni
 
-+ Adding 12.12.12.12/32 route into BGP advertisement on both leaf01 and leaf02, leaf03 is now having the route to this IP and it's reachable from leaf03:
++ Adding 12.12.12.12/32 route into BGP advertisement on both leaf01 and leaf02 with 'net add bgp network 12.12.12.12/32', leaf03 is now having the route to this IP and it's reachable from leaf03:
   cumulus@leaf03:~$ net show route 12.12.12.12
   RIB entry for 12.12.12.12
   =========================
@@ -151,7 +152,7 @@ Solution
   64 bytes from 192.168.10.20: icmp_seq=2 ttl=64 time=2.80 ms
   64 bytes from 192.168.10.20: icmp_seq=3 ttl=64 time=2.47 ms
 
-+ Finally correct the source tunnel IP of the VNI interface vni10010, it should be the unique loopback IP of the VTEP, instead of anycast GW IP according to the user guide:
++ (Alredy done) Finally correct the source tunnel IP of the VNI interface vni10010, it should be the unique loopback IP of the VTEP, instead of anycast GW IP according to the user guide:
   cumulus@leaf01:~$ net add vxlan vni10010 vxlan local-tunnelip 10.0.0.11
   cumulus@leaf01:~$ net commit
   cumulus@leaf02:~$ net add vxlan vni10010 vxlan local-tunnelip 10.0.0.12

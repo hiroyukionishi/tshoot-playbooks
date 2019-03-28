@@ -124,6 +124,7 @@ internet: 88.88.88.88, outside of the VxLAN fabric
     * 104001     L3   192.168.20.3:3        65013:104001              65013:104001             TENANT-A
 
 + Now checking the EVPN routes on leaf01, entry for server03 is being populated:
+  (If missing, try ping from server03 to learn mac)
     cumulus@leaf01:~$ net show bgp l2vpn evpn route
     BGP table version is 12, local router ID is 12.12.12.12
     Status codes: s suppressed, d damped, h history, * valid, > best, i - internal
@@ -153,7 +154,7 @@ internet: 88.88.88.88, outside of the VxLAN fabric
     listening on eth1, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 + running a capture on leaf01/leaf02 for ICMP request in the ingress direction, confirmed the ICMP request is being captured on leaf01:
-    cumulus@leaf01:~$ sudo tcpdump -enni swp1 icmp
+    cumulus@leaf01:~$ sudo tcpdump -enni swp1 icmp (If missing, just re-run tcpdump.)
     [sudo] password for cumulus:
     tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
     listening on swp1, link-type EN10MB (Ethernet), capture size 262144 bytes
@@ -284,7 +285,7 @@ Now moving onto the second issue, which is servers not able to reach internet @ 
       neighbor 60.0.0.1 remote-as external
 
 + Correct the above mis-configuration with the below NCLU commands on both exit01 and exit02:
-    - net del bgp l2vpn evpn advertise ipv4 unicast
+    - net del bgp l2vpn evpn advertise ipv4 unicast (On 3.7.3, it has a problem, delete by editing frr.conf)
     - net add bgp vrf TENANT-A l2vpn evpn advertise ipv4 unicast
 
 + Now checking on exit01 switch again for type-5 route, it is now showing the internet address is being populated correctly:

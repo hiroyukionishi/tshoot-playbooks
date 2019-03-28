@@ -101,3 +101,9 @@
       command: sudo ifconfig eth2 promisc
       when: '"Cumulus" not in ansible_lsb.id'
       ignore_errors: True
+
+    - name: Reboot all nodes to flush previous state
+      shell: "sleep 2 && sudo shutdown -r now"
+      async: 1
+      poll: 0
+      ignore_erros: True
